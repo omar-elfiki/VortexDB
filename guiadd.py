@@ -2,7 +2,7 @@ from PyQt5.QtWidgets import QPushButton, QGridLayout, QWidget, QTableView, QLabe
 from PyQt5.QtGui import QFont
 from PyQt5.QtCore import Qt
 from DBOps import dbconnect, dbadddata, dataretrieve
-import inital_gui as GUI
+import mainGUI as GUI
 
 def add_customer(main_window):
     conn = dbconnect.db_connect()
@@ -193,21 +193,42 @@ def add_screen(main_window):
         label.setFixedSize(485, 50)
         font = QFont("Helvetica", 20)
         label.setFont(font)
+
         inputs_layout.addWidget(label)
         branch_label = QLabel("Branch", main_window)
         inputs_layout.addWidget(branch_label)
         branch_input = QComboBox(main_window)
         branch_input.addItems(branches)
         inputs_layout.addWidget(branch_input)
+
+        screen_label = QLabel("Screen Number", main_window)
+        inputs_layout.addWidget(screen_label)
+        screen_input = QLineEdit(main_window)
+        inputs_layout.addWidget(screen_input)
+
+        validity_input = QLineEdit(main_window)
+        validity_input.setReadOnly(True)
+        inputs_layout.addWidget(validity_input)
+
+        def update_validity(index):
+            branch = branch_input.itemText(index)
+            screen = screen_input.text()
+            validity = dataretrieve.getscreenvalidity(branch, screen)
+            validity_input.setText(validity)
+
+        screen_input.textChanged.connect(lambda: update_validity(branch_input.currentIndex()))
+
         seat_label = QLabel("Seat Type", main_window)
         inputs_layout.addWidget(seat_label)
         seat_input = QComboBox(main_window)
         seat_input.addItems(types)
         inputs_layout.addWidget(seat_input)
+
         number_label = QLabel("Number of Seats", main_window)
         inputs_layout.addWidget(number_label)
         number_input = QLineEdit(main_window)
         inputs_layout.addWidget(number_input)
+
         date_label = QLabel("Date of Inspection (YYYY-MM-DD)", main_window)
         inputs_layout.addWidget(date_label)
         date_input = QLineEdit(main_window)
@@ -216,7 +237,7 @@ def add_screen(main_window):
         buttons = QHBoxLayout()
         add_button = QPushButton("Add", main_window)
         add_button.setFixedSize(200, 50)
-        add_button.clicked.connect(lambda: dbadddata.add_new_screen(dataretrieve.getbranchid(branch_input.currentText()), seat_input.currentText(), number_input.text(), date_input.text()))
+        add_button.clicked.connect(lambda: dbadddata.add_new_screen(int(screen_input.text()),dataretrieve.getbranchid(branch_input.currentText()), seat_input.currentText(), number_input.text(), date_input.text()))
         buttons.addWidget(add_button)
         back_button = QPushButton("Back", main_window)
         back_button.setFixedSize(200, 50)
@@ -241,7 +262,6 @@ def add_movie_showing(main_window):
     conn = dbconnect.db_connect()
     branches = dataretrieve.getbranches([])
     movies = dataretrieve.getMovies([])
-    # screens = dataretrieve.getscreens([])
     if conn is not None:
         GUI.clear(main_window)
         layout = QVBoxLayout()
@@ -258,16 +278,24 @@ def add_movie_showing(main_window):
         movie_input = QComboBox(main_window)
         movie_input.addItems(movies)
         inputs_layout.addWidget(movie_input)
-        screen_label = QLabel("Screen", main_window)
-        inputs_layout.addWidget(screen_label)
-        screen_input = QComboBox(main_window)
-        # screen_input.addItems(screens)
-        inputs_layout.addWidget(screen_input)
         branch_label = QLabel("Branch", main_window)
         inputs_layout.addWidget(branch_label)
         branch_input = QComboBox(main_window)
         branch_input.addItems(branches)
         inputs_layout.addWidget(branch_input)
+        screen_label = QLabel("Screen", main_window)
+        inputs_layout.addWidget(screen_label)
+        screen_input = QComboBox(main_window)
+        inputs_layout.addWidget(screen_input)
+
+        def update_screens(index):
+            branch = branch_input.itemText(index)
+            screens = dataretrieve.getscreens([], branch)
+            screen_input.clear()
+            screen_input.addItems(screens)
+
+        branch_input.currentIndexChanged.connect(update_screens)
+
         date_label = QLabel("Date (YYYY-MM-DD)", main_window)
         inputs_layout.addWidget(date_label)
         date_input = QLineEdit(main_window)
@@ -280,7 +308,7 @@ def add_movie_showing(main_window):
         buttons = QHBoxLayout()
         add_button = QPushButton("Add", main_window)
         add_button.setFixedSize(200, 50)
-        add_button.clicked.connect(lambda: dbadddata.add_new_movie_showing(dataretrieve.getmovieid(movie_input.currentText()), dataretrieve.getscreenid(screen_input.currentText()), dataretrieve.getbranchid(branch_input.currentText()), date_input.text(), time_input.text()))
+        add_button.clicked.connect(lambda: dbadddata.add_new_showing(dataretrieve.getScreenID(screen_input.currentText()), dataretrieve.getbranchid(branch_input.currentText()), dataretrieve.getmovieid(movie_input.currentText()), date_input.text(), time_input.text()))
         buttons.addWidget(add_button)
         back_button = QPushButton("Back", main_window)
         back_button.setFixedSize(200, 50)
@@ -298,7 +326,7 @@ def add_movie_showing(main_window):
 def add_showing_management(main_window):
     conn = dbconnect.db_connect()
     branches = dataretrieve.getbranches([])
-    employees = dataretrieve.getemployee([])
+    
     if conn is not None:
         GUI.clear(main_window)
         layout = QVBoxLayout()
@@ -310,29 +338,69 @@ def add_showing_management(main_window):
         font = QFont("Helvetica", 20)
         label.setFont(font)
         inputs_layout.addWidget(label)
-        employee_label = QLabel("Employee", main_window)
-        inputs_layout.addWidget(employee_label)
-        employee_input = QComboBox(main_window)
-        employee_input.addItems(employees)
-        inputs_layout.addWidget(employee_input)
-        showing_label = QLabel("Showing", main_window)
-        inputs_layout.addWidget(showing_label)
-        showing_input = QLineEdit(main_window)
-        inputs_layout.addWidget(showing_input)
-        screen_label = QLabel("Screen", main_window)
-        inputs_layout.addWidget(screen_label)
-        screen_input = QLineEdit(main_window)
-        inputs_layout.addWidget(screen_input)
+
         branch_label = QLabel("Branch", main_window)
         inputs_layout.addWidget(branch_label)
         branch_input = QComboBox(main_window)
         branch_input.addItems(branches)
         inputs_layout.addWidget(branch_input)
+        
+
+        employee_label = QLabel("Employee", main_window)
+        inputs_layout.addWidget(employee_label)
+        employee_input = QComboBox(main_window)
+        inputs_layout.addWidget(employee_input)
+
+        def update_employees(index):
+            branch = branch_input.itemText(index)
+            employees = dataretrieve.getemployee([], branch)
+            employee_input.clear()
+            employee_input.addItems(employees)
+
+        branch_input.currentIndexChanged.connect(update_employees)
+
+
+        showing_label = QLabel("Showing", main_window)
+        inputs_layout.addWidget(showing_label)
+        showing_input = QComboBox(main_window)
+        inputs_layout.addWidget(showing_input)
+        showing_details = QLineEdit(main_window)
+        showing_details.setReadOnly(True)
+        inputs_layout.addWidget(showing_details)
+
+        def update_showing_details(index):
+            branch = branch_input.itemText(index)
+            showing = showing_input.itemText(index)
+            showingdetails = dataretrieve.getshowinginfo(branch, showing)
+            showing_details.setText(showingdetails)
+
+        def update_showings(index):
+            branch = branch_input.itemText(index)
+            showings = dataretrieve.getshowingIDs([], branch)
+            showing_input.clear()
+            showing_input.addItems(showings)
+    
+
+        branch_input.currentIndexChanged.connect(update_showings)
+        showing_input.currentIndexChanged.connect(update_showing_details)
+        
+
+        screen_label = QLabel("Screen", main_window)
+        inputs_layout.addWidget(screen_label)
+        screen_input = QLineEdit(main_window)
+        screen_input.setReadOnly(True)
+        inputs_layout.addWidget(screen_input)
+
+        def updateScreen(index):
+            screening = dataretrieve.getshowingscreen(branch_input.currentText(), showing_input.currentText())
+            screen_input.setText(screening)
+
+        showing_input.currentIndexChanged.connect(updateScreen)
 
         buttons = QHBoxLayout()
         add_button = QPushButton("Assign", main_window)
         add_button.setFixedSize(200, 50)
-        add_button.clicked.connect(lambda: dbadddata.assign_management(dataretrieve.getEmployeeid(employee_input.currentText()), showing_input.text(), screen_input.text(), dataretrieve.getbranchid(branch_input.currentText())))
+        add_button.clicked.connect(lambda: dbadddata.assign_management(dataretrieve.getEmployeeid(employee_input.currentText()), showing_input.currentText(), screen_input.text(), dataretrieve.getbranchid(branch_input.currentText())))
         buttons.addWidget(add_button)
         back_button = QPushButton("Back", main_window)
         back_button.setFixedSize(200, 50)

@@ -2,7 +2,7 @@ from PyQt5.QtSql import QSqlDatabase
 
 def db_connect():
     server = 'localhost'
-    database = 'Cinema-1'
+    database = 'Cinema-2'
     driver = 'QODBC3'  # QODBC3 is the QSqlDatabase driver for ODBC
 
     # Create a QSqlDatabase object
@@ -21,9 +21,9 @@ def db_connect():
         return None
 
 def db_disconnect(main_window, db):
-    import inital_gui
-    inital_gui.clear(main_window)
-    inital_gui.home(main_window)
+    import mainGUI
+    mainGUI.clear(main_window)
+    mainGUI.home(main_window)
     db.close()
     print("Connection closed")
 

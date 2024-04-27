@@ -4,7 +4,8 @@ from PyQt5.QtCore import Qt
 from PyQt5.QtSql import QSqlQueryModel
 from DBOps.dbconnect import db_connect, db_disconnect
 from guiadd import add_customer, add_employee, add_movie, add_screen, add_movie_showing, add_showing_management
-
+import guiops as ops
+import guireports as greports
 
 def get_all(conn, table_name):
     model = QSqlQueryModel()
@@ -41,7 +42,7 @@ def actions(main_window):
     conn = db_connect()
     if conn is not None:
         clear(main_window)
-        name_list = ['Add', 'View', 'Operations', 'Reports']
+        name_list = ['Add Records', 'View Records', 'Operations', 'Reports']
         functionlist = [lambda: add(main_window), lambda: view(main_window), lambda: operations(main_window), lambda: reports(main_window)]
         grid_layout = QGridLayout()
         for i in range(2):
@@ -113,8 +114,9 @@ def operations(main_window):
     conn = db_connect()
     if conn is not None:
         clear(main_window)
-        name_list = ['Screen Schedule', 'Customer Tickets', 'Upcoming Movie Screenings', 'Empty Showings']
-        functionlist = []
+        name_list = ['Screen Schedule', 'Sell Tickets', 'Upcoming Movie Screenings', 'Empty Showings']
+        functionlist = [lambda: ops.screenschedule(main_window), lambda: ops.sell_tickets(main_window), 
+                        lambda: ops.upcomingmovies(main_window), lambda: ops.emptyshowings(main_window)]
 
         grid_layout = QGridLayout()
         for i in range(2):
@@ -122,11 +124,21 @@ def operations(main_window):
                 index = i * 2 + j
                 button = QPushButton(f'{name_list[index]}' , main_window)
                 button.setFixedSize(200, 50)
-                #button.clicked.connect(functionlist[index])
+                button.clicked.connect(functionlist[index])
                 grid_layout.addWidget(button, i, j)
         
         layout = QVBoxLayout()
         layout.addLayout(grid_layout)
+
+        customer_button_layout = QHBoxLayout()
+        customer_button = QPushButton("Customer Tickets", main_window)
+        customer_button.setFixedSize(200, 50)
+        customer_button.clicked.connect(lambda: ops.customertickets(main_window))
+        customer_button_layout.addStretch(2)
+        customer_button_layout.addWidget(customer_button)
+        customer_button_layout.addStretch(2)
+
+        layout.addLayout(customer_button_layout)
 
         back_button_layout = QHBoxLayout()
         back_button = QPushButton("Back", main_window)
@@ -153,7 +165,7 @@ def reports(main_window):
     if conn is not None:
         clear(main_window)
         name_list = ['Total Tickets Sold', 'Tickets Sold by Branch', 'Average Tickets Per Movie']
-        functionlist = []
+        functionlist = [lambda: greports.total_tickets_sold(main_window), lambda: greports.tickets_sold_by_branch(main_window), lambda: greports.average_tickets(main_window)]
 
         grid_layout = QGridLayout()
         for i in range(3):
@@ -161,7 +173,7 @@ def reports(main_window):
                 index = i * 1 + j
                 button = QPushButton(f'{name_list[index]}' , main_window)
                 button.setFixedSize(200, 50)
-                #button.clicked.connect(functionlist[index])
+                button.clicked.connect(functionlist[index])
                 grid_layout.addWidget(button, i, j)
         
         layout = QVBoxLayout()
@@ -232,6 +244,7 @@ def view(main_window):
 
 
 def displaytable(main_window, model):
+    print(model)
     layout = QVBoxLayout()
 
     table_view = QTableView()
@@ -244,7 +257,7 @@ def displaytable(main_window, model):
 
     back_button = QPushButton("Back", main_window)
     back_button.setFixedSize(200, 50)
-    back_button.clicked.connect(lambda: view(main_window))
+    back_button.clicked.connect(lambda: actions(main_window))
     layout.addWidget(back_button)
 
 

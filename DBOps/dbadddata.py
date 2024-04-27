@@ -28,12 +28,13 @@ def add_new_customer(name, email, phone_number, birth_date):
         msg.setText("Failed to connect to database")
         msg.exec_()
 
-def add_new_screen(branch_id, seat_type, numberofseats, dateofinspection):
+def add_new_screen(screen_id, branch_id, seat_type, numberofseats, dateofinspection):
     conn = dbconnect.db_connect()
     if conn is not None:
         query = QtSql.QSqlQuery(conn)
-        insert_query = "INSERT INTO Screen (Branch_ID, Seat_Type, Number_of_seats, Date_of_inspection) VALUES (?, ?, ?, ?)"
+        insert_query = "INSERT INTO Screen (Screen_ID, Branch_ID, Seat_Type, Number_of_seats, Date_of_inspection) VALUES (?, ?, ?, ?, ?)"
         query.prepare(insert_query)
+        query.addBindValue(screen_id)
         query.addBindValue(branch_id)
         query.addBindValue(seat_type)
         query.addBindValue(numberofseats)
@@ -99,7 +100,7 @@ def add_new_showing(screen_id, branch_id, movie_id, date, time):
     conn = dbconnect.db_connect()
     if conn is not None:
         query = QtSql.QSqlQuery(conn)
-        insert_query = "INSERT INTO Showing (Screen_ID, Branch_ID, Movie_ID, Date, Time) VALUES (?, ?, ?, ?, ?)"
+        insert_query = "INSERT INTO Movie_Showing (Screen_ID, Branch_ID, Movie_ID, Date, Time) VALUES (?, ?, ?, ?, ?)"
         query.prepare(insert_query)
         query.addBindValue(screen_id)
         query.addBindValue(branch_id)
