@@ -87,6 +87,7 @@ def add_employee(main_window):
         branch = QLabel("Branch", main_window)
         inputs_layout.addWidget(branch)
         branch_input = QComboBox(main_window)
+        branch_input.addItem("Select Branch")
         branch_input.addItems(branches)
         inputs_layout.addWidget(branch_input)
 
@@ -138,12 +139,14 @@ def add_movie(main_window):
         language_label = QLabel("Language", main_window)
         inputs_layout.addWidget(language_label)
         language_input = QComboBox(main_window)
+        language_input.addItem("Select Language")
         language_input.addItems(languages)
         inputs_layout.addWidget(language_input)
 
         subtitles_label = QLabel("Subtitles", main_window)
         inputs_layout.addWidget(subtitles_label)
         subtitles_input = QComboBox(main_window)
+        subtitles_input.addItem("Select Subtitles")
         subtitles_input.addItems(languages)
         inputs_layout.addWidget(subtitles_input)
 
@@ -157,6 +160,7 @@ def add_movie(main_window):
         age_label = QLabel("Age Rating", main_window)
         inputs_layout.addWidget(age_label)
         age_input = QComboBox(main_window)
+        age_input.addItem("Select Age Rating")
         age_input.addItems([str(i) for i in ages])
         inputs_layout.addWidget(age_input)
 
@@ -198,6 +202,7 @@ def add_screen(main_window):
         branch_label = QLabel("Branch", main_window)
         inputs_layout.addWidget(branch_label)
         branch_input = QComboBox(main_window)
+        branch_input.addItem("Select Branch")
         branch_input.addItems(branches)
         inputs_layout.addWidget(branch_input)
 
@@ -221,6 +226,7 @@ def add_screen(main_window):
         seat_label = QLabel("Seat Type", main_window)
         inputs_layout.addWidget(seat_label)
         seat_input = QComboBox(main_window)
+        seat_input.addItem("Select Seat Type")
         seat_input.addItems(types)
         inputs_layout.addWidget(seat_input)
 
@@ -276,16 +282,19 @@ def add_movie_showing(main_window):
         movie_label = QLabel("Movie", main_window)
         inputs_layout.addWidget(movie_label)
         movie_input = QComboBox(main_window)
+        movie_input.addItem("Select Movie")
         movie_input.addItems(movies)
         inputs_layout.addWidget(movie_input)
         branch_label = QLabel("Branch", main_window)
         inputs_layout.addWidget(branch_label)
         branch_input = QComboBox(main_window)
+        branch_input.addItem("Select Branch")
         branch_input.addItems(branches)
         inputs_layout.addWidget(branch_input)
         screen_label = QLabel("Screen", main_window)
         inputs_layout.addWidget(screen_label)
         screen_input = QComboBox(main_window)
+        screen_input.addItem("Select Screen")
         inputs_layout.addWidget(screen_input)
 
         def update_screens(index):
@@ -342,19 +351,22 @@ def add_showing_management(main_window):
         branch_label = QLabel("Branch", main_window)
         inputs_layout.addWidget(branch_label)
         branch_input = QComboBox(main_window)
+        branch_input.addItem("Select Branch")
         branch_input.addItems(branches)
+        branch_input.setCurrentIndex(0)
         inputs_layout.addWidget(branch_input)
         
 
         employee_label = QLabel("Employee", main_window)
         inputs_layout.addWidget(employee_label)
         employee_input = QComboBox(main_window)
+        employee_input.addItem("Select Employee")
+        employee_input.setCurrentIndex(0)
         inputs_layout.addWidget(employee_input)
 
         def update_employees(index):
             branch = branch_input.itemText(index)
             employees = dataretrieve.getemployee([], branch)
-            employee_input.clear()
             employee_input.addItems(employees)
 
         branch_input.currentIndexChanged.connect(update_employees)
@@ -363,21 +375,21 @@ def add_showing_management(main_window):
         showing_label = QLabel("Showing", main_window)
         inputs_layout.addWidget(showing_label)
         showing_input = QComboBox(main_window)
+        showing_input.addItem("Select Showing")
+        showing_input.setCurrentIndex(0)
         inputs_layout.addWidget(showing_input)
         showing_details = QLineEdit(main_window)
         showing_details.setReadOnly(True)
         inputs_layout.addWidget(showing_details)
 
-        def update_showing_details(index):
-            branch = branch_input.itemText(index)
-            showing = showing_input.itemText(index)
-            showingdetails = dataretrieve.getshowinginfo(branch, showing)
-            showing_details.setText(showingdetails)
+        def update_showing_details():
+            branch = branch_input.currentText()
+            showing = showing_input.currentText()
+            showing_details.setText(dataretrieve.getshowinginfo(branch, showing))
 
         def update_showings(index):
             branch = branch_input.itemText(index)
             showings = dataretrieve.getshowingIDs([], branch)
-            showing_input.clear()
             showing_input.addItems(showings)
     
 

@@ -56,39 +56,51 @@ def getemployee(list, branch):
         return list
 
 def getbranchid(selected_option):
-    conn = db_connect()
-    if conn is not None:
-        query = QSqlQuery(conn)
-        select_query = "SELECT Branch_ID FROM Cinema_Branch WHERE Branch_name = ?"
-        query.prepare(select_query)
-        query.addBindValue(selected_option)
-        if query.exec_():
-            query.next()
-            return query.value(0)
-    else:
+    if selected_option == "Select Branch":
         msg = QMessageBox()
         msg.setWindowTitle("Error")
-        msg.setText("Failed to fetch data from database")
+        msg.setText("Select a valid branch")
         msg.exec_()
+    else:
+        conn = db_connect()
+        if conn is not None:
+            query = QSqlQuery(conn)
+            select_query = "SELECT Branch_ID FROM Cinema_Branch WHERE Branch_name = ?"
+            query.prepare(select_query)
+            query.addBindValue(selected_option)
+            if query.exec_():
+                query.next()
+                return query.value(0)
+        else:
+            msg = QMessageBox()
+            msg.setWindowTitle("Error")
+            msg.setText("Failed to fetch data from database")
+            msg.exec_()
 
 def getEmployeeid(selected_option):
-    conn = db_connect()
-    if conn is not None:
-        query = QSqlQuery(conn)
-        select_query = "SELECT Employee_ID FROM Employee WHERE Name = ?"
-        query.prepare(select_query)
-        query.addBindValue(selected_option)
-        if query.exec_():
-            query.next()
-            return query.value(0)
-    else:
+    if selected_option == "Select Employee":
         msg = QMessageBox()
         msg.setWindowTitle("Error")
-        msg.setText("Failed to fetch data from database")
+        msg.setText("Select a valid employee")
         msg.exec_()
+    else:
+        conn = db_connect()
+        if conn is not None:
+            query = QSqlQuery(conn)
+            select_query = "SELECT Employee_ID FROM Employee WHERE Name = ?"
+            query.prepare(select_query)
+            query.addBindValue(selected_option)
+            if query.exec_():
+                query.next()
+                return query.value(0)
+        else:
+            msg = QMessageBox()
+            msg.setWindowTitle("Error")
+            msg.setText("Failed to fetch data from database")
+            msg.exec_()
 
 def getscreens(list,branch):
-    if branch == "":
+    if branch == "select branch":
         return list.append("Select Branch to view screens")
     else:
         conn = db_connect()
@@ -109,8 +121,14 @@ def getscreens(list,branch):
         return list
 
 def getScreenID(screen):
-    screen_number = int(screen.split(' ')[1])
-    return screen_number
+    if screen == "Select Screen":
+        msg = QMessageBox()
+        msg.setWindowTitle("Error")
+        msg.setText("Select a valid screen")
+        msg.exec_()
+    else:
+        screen_number = int(screen.split(' ')[1])
+        return screen_number
 
 def getMovies(list):
     conn = db_connect()
@@ -129,22 +147,25 @@ def getMovies(list):
     return list
 
 def getshowingIDs(list, branch):
-    conn = db_connect()
-    if conn is not None:
-        id = getbranchid(branch)
-        query = QSqlQuery(conn)
-        select_query = (f"SELECT Showing_ID FROM Movie_Showing WHERE Branch_ID = '{id}'")
-        query.prepare(select_query)
-        if query.exec_():
-            while query.next():
-                list.append(str(query.value(0)))
-            if list == []:
-                list.append("No Showings Found")
+    if branch == "Select Branch":
+        list.append("Select Branch to view showings")
     else:
-        msg = QMessageBox()
-        msg.setWindowTitle("Error")
-        msg.setText("Failed to fetch data from database")
-        msg.exec_()
+        conn = db_connect()
+        if conn is not None:
+            id = getbranchid(branch)
+            query = QSqlQuery(conn)
+            select_query = (f"SELECT Showing_ID FROM Movie_Showing WHERE Branch_ID = '{id}'")
+            query.prepare(select_query)
+            if query.exec_():
+                while query.next():
+                    list.append(str(query.value(0)))
+                if list == []:
+                    list.append("No Showings Found")
+        else:
+            msg = QMessageBox()
+            msg.setWindowTitle("Error")
+            msg.setText("Failed to fetch data from database")
+            msg.exec_()
     return list
 
 def getshowinginfo(branch, showingID):
@@ -155,14 +176,13 @@ def getshowinginfo(branch, showingID):
         if conn is not None:
             id = getbranchid(branch)
             date_query = "SELECT Date FROM Movie_Showing WHERE Branch_ID = ? and Showing_ID = ?"
+            time_query = "SELECT Time FROM Movie_Showing WHERE Branch_ID = ? and Showing_ID = ?"
             date = execute_query(date_query, [id, showingID])
             if date == None:
-                return "No Showings found"
+                return "No Details found"
+            
             date_string = date.toString('yyyy-MM-dd')
-
-            # time_query = "SELECT Time FROM Movie_Showing WHERE Branch_ID = ? and Showing_ID = ?"
-            # time_str = execute_query(time_query, [branch, showingID])
-            # time = QTime.fromString(time_str, 'hh:mm:ss')
+            time = execute_query(time_query, [id, showingID])
 
             movie_id_query = "SELECT Movie_ID FROM Movie_Showing WHERE Showing_ID = ?"
             movie_id = execute_query(movie_id_query, [showingID])
@@ -170,7 +190,9 @@ def getshowinginfo(branch, showingID):
             title_query = "SELECT Title FROM Movie WHERE Movie_ID = ?"
             title = execute_query(title_query, [movie_id])
 
-            if date and title:
+            if date and title and time:
+                return f"Showing of {title} on {date_string} at {time}"
+            elif date and title:
                 return f"Showing of {title} on {date_string}"
             else:
                 msg = QMessageBox()
@@ -212,22 +234,27 @@ def getcustID(phone):
         msg.exec_()
 
 def getshowingscreen(branch, screeningID):
-    conn = db_connect()
-    if conn is not None:
-        id = getbranchid(branch)
-        query = QSqlQuery(conn)
-        select_query = (f"SELECT Screen_ID FROM Movie_Showing WHERE Branch_ID = '{id}' AND Showing_ID = '{screeningID}'")
-        query.prepare(select_query)
-        if query.exec_():
-            query.next()
-            return str(query.value(0))
+    if branch == "Select Branch" or screeningID == "Select Showing":
+        return "Select Showing to view screen"
     else:
-        msg = QMessageBox()
-        msg.setWindowTitle("Error")
-        msg.setText("Failed to fetch data from database")
-        msg.exec_()
+        conn = db_connect()
+        if conn is not None:
+            id = getbranchid(branch)
+            query = QSqlQuery(conn)
+            select_query = (f"SELECT Screen_ID FROM Movie_Showing WHERE Branch_ID = '{id}' AND Showing_ID = '{screeningID}'")
+            query.prepare(select_query)
+            if query.exec_():
+                query.next()
+                return str(query.value(0))
+        else:
+            msg = QMessageBox()
+            msg.setWindowTitle("Error")
+            msg.setText("Failed to fetch data from database")
+            msg.exec_()
 
 def getscreenvalidity(branch, screenID):
+    if branch == "Select Branch":
+        return "Select Branch to view screens"
     conn = db_connect()
     if conn is not None:
         if screenID == "":
@@ -250,17 +277,23 @@ def getscreenvalidity(branch, screenID):
         msg.exec_()
 
 def getmovieid(title):
-    conn = db_connect()
-    if conn is not None:
-        query = QSqlQuery(conn)
-        select_query = "SELECT Movie_ID FROM Movie WHERE Title = ?"
-        query.prepare(select_query)
-        query.addBindValue(title)
-        if query.exec_():
-            query.next()
-            return query.value(0)
-    else:
+    if title == "Select Movie":
         msg = QMessageBox()
         msg.setWindowTitle("Error")
-        msg.setText("Failed to fetch data from database")
+        msg.setText("Select a valid movie")
         msg.exec_()
+    else:   
+        conn = db_connect()
+        if conn is not None:
+            query = QSqlQuery(conn)
+            select_query = "SELECT Movie_ID FROM Movie WHERE Title = ?"
+            query.prepare(select_query)
+            query.addBindValue(title)
+            if query.exec_():
+                query.next()
+                return query.value(0)
+        else:
+            msg = QMessageBox()
+            msg.setWindowTitle("Error")
+            msg.setText("Failed to fetch data from database")
+            msg.exec_()

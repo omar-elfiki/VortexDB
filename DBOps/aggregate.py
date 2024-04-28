@@ -1,5 +1,4 @@
 import PyQt5.QtSql as QtSql
-from PyQt5.QtWidgets import QMessageBox
 
 def sum_all_ticks(date, conn):
     model = QtSql.QSqlQueryModel()

@@ -159,6 +159,11 @@ def assign_management(Employee_ID, Showing_ID, Screen_ID, Branch_ID):
             msg.setWindowTitle("Success")
             msg.setText("New Showing Management added")
             msg.exec_()
+        elif "Violation of PRIMARY KEY constraint" in query.lastError().text():
+            msg = QMessageBox()
+            msg.setWindowTitle("Error")
+            msg.setText("Employee is already assigned to this showing")
+            msg.exec_()
         else:
             msg = QMessageBox()
             msg.setWindowTitle("Error")
