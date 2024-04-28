@@ -2,7 +2,7 @@ from PyQt5.QtWidgets import QPushButton, QGridLayout, QWidget, QTableView, QLabe
 from PyQt5.QtGui import QFont
 from PyQt5.QtCore import Qt
 from DBOps import dbconnect, dbadddata, dataretrieve
-import mainGUI as GUI
+import GUI.mainGUI as GUI
 
 def add_customer(main_window):
     conn = dbconnect.db_connect()
@@ -37,7 +37,7 @@ def add_customer(main_window):
         buttons = QHBoxLayout()
         add_button = QPushButton("Add", main_window)
         add_button.setFixedSize(200, 50)
-        add_button.clicked.connect(lambda: dbadddata.add_new_customer(name_input.text(), email_input.text(), phone_input.text(), birth_input.text()))
+        add_button.clicked.connect(lambda: GUI.check_parameters(dbadddata.add_new_customer, name_input.text(), email_input.text(), phone_input.text(), birth_input.text()))
         buttons.addWidget(add_button)
         back_button = QPushButton("Back", main_window)
         back_button.setFixedSize(200, 50)
@@ -93,7 +93,7 @@ def add_employee(main_window):
         buttons = QHBoxLayout()
         add_button = QPushButton("Add", main_window)
         add_button.setFixedSize(200, 50)
-        add_button.clicked.connect(lambda: dbadddata.add_new_employee(name_input.text(), email_input.text(), phone_input.text(), dataretrieve.getbranchid(branch_input.currentText())))
+        add_button.clicked.connect(lambda: GUI.check_parameters(dbadddata.add_new_employee, name_input.text(), email_input.text(), phone_input.text(), dataretrieve.getbranchid(branch_input.currentText())))
         buttons.addWidget(add_button)
         back_button = QPushButton("Back", main_window)
         back_button.setFixedSize(200, 50)
@@ -163,7 +163,7 @@ def add_movie(main_window):
         buttons = QHBoxLayout()
         add_button = QPushButton("Add", main_window)
         add_button.setFixedSize(200, 50)
-        add_button.clicked.connect(lambda: dbadddata.add_new_movie(title_input.text(), language_input.currentText(), subtitles_input.currentText(), start_date_input.text(), end_date_input.text(), age_input.currentText()))
+        add_button.clicked.connect(lambda: GUI.check_parameters(dbadddata.add_new_movie, title_input.text(), language_input.currentText(), subtitles_input.currentText(), start_date_input.text(), end_date_input.text(), age_input.currentText()))
         buttons.addWidget(add_button)
         back_button = QPushButton("Back", main_window)
         back_button.setFixedSize(200, 50)
@@ -237,7 +237,7 @@ def add_screen(main_window):
         buttons = QHBoxLayout()
         add_button = QPushButton("Add", main_window)
         add_button.setFixedSize(200, 50)
-        add_button.clicked.connect(lambda: dbadddata.add_new_screen(int(screen_input.text()),dataretrieve.getbranchid(branch_input.currentText()), seat_input.currentText(), number_input.text(), date_input.text()))
+        add_button.clicked.connect(lambda: GUI.check_parameters(dbadddata.add_new_screen, screen_input.text(),dataretrieve.getbranchid(branch_input.currentText()), seat_input.currentText(), number_input.text(), date_input.text()))
         buttons.addWidget(add_button)
         back_button = QPushButton("Back", main_window)
         back_button.setFixedSize(200, 50)
@@ -308,7 +308,7 @@ def add_movie_showing(main_window):
         buttons = QHBoxLayout()
         add_button = QPushButton("Add", main_window)
         add_button.setFixedSize(200, 50)
-        add_button.clicked.connect(lambda: dbadddata.add_new_showing(dataretrieve.getScreenID(screen_input.currentText()), dataretrieve.getbranchid(branch_input.currentText()), dataretrieve.getmovieid(movie_input.currentText()), date_input.text(), time_input.text()))
+        add_button.clicked.connect(lambda: GUI.check_parameters(dbadddata.add_new_showing, screen_input.currentText(), branch_input.currentText(), movie_input.currentText(), date_input.text(), time_input.text()))
         buttons.addWidget(add_button)
         back_button = QPushButton("Back", main_window)
         back_button.setFixedSize(200, 50)
@@ -400,7 +400,7 @@ def add_showing_management(main_window):
         buttons = QHBoxLayout()
         add_button = QPushButton("Assign", main_window)
         add_button.setFixedSize(200, 50)
-        add_button.clicked.connect(lambda: dbadddata.assign_management(dataretrieve.getEmployeeid(employee_input.currentText()), showing_input.currentText(), screen_input.text(), dataretrieve.getbranchid(branch_input.currentText())))
+        add_button.clicked.connect(lambda: GUI.check_parameters(dbadddata.assign_management, dataretrieve.getEmployeeid(employee_input.currentText()), showing_input.currentText(), screen_input.text(), dataretrieve.getbranchid(branch_input.currentText())))
         buttons.addWidget(add_button)
         back_button = QPushButton("Back", main_window)
         back_button.setFixedSize(200, 50)

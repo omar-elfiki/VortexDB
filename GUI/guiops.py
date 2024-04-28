@@ -1,5 +1,5 @@
 import DBOps.operations as ops
-import mainGUI as GUI
+import GUI.mainGUI as GUI
 from PyQt5.QtWidgets import QMessageBox, QComboBox, QVBoxLayout, QHBoxLayout, QLineEdit, QLabel, QWidget, QPushButton
 from PyQt5.QtGui import QFont
 from PyQt5.QtCore import Qt
@@ -7,6 +7,8 @@ from DBOps.dbconnect import db_connect
 import DBOps.dataretrieve as dataretrieve
 
 def view_schedule(main_window, branch, screen):
+    branch = dataretrieve.getbranchid(branch)
+    screen = dataretrieve.getScreenID(screen)
     conn = db_connect()
     if conn is not None:
         schedule = ops.get_screen_schedule(conn,screen,branch)
@@ -24,6 +26,25 @@ def view_schedule(main_window, branch, screen):
         msg.setWindowTitle("Error")
         msg.setText("Failed to connect to database")
         msg.exec_()
+
+def get_customer_tickets(main_window, parameter):
+    conn = db_connect()
+    if conn is not None:
+        tickets = ops.get_customer_tickets(conn, parameter)
+        if tickets is None or tickets.rowCount() == 0:
+            msg = QMessageBox()
+            msg.setWindowTitle("No Results")
+            msg.setText("No tickets found for this customer")
+            msg.exec_()
+        else:
+            GUI.clear(main_window)
+            GUI.displaytable(main_window, tickets)
+    else:
+        msg = QMessageBox()
+        msg.setWindowTitle("Error")
+        msg.setText("Failed to connect to database")
+        msg.exec_()
+
 
 def view_upcoming_movies(main_window, title_input):
     conn = db_connect()
@@ -83,7 +104,7 @@ def screenschedule(main_window):
         buttons = QHBoxLayout()
         view_button = QPushButton("View", main_window)
         view_button.setFixedSize(200, 50)
-        view_button.clicked.connect(lambda: view_schedule(main_window, dataretrieve.getbranchid(branch_input.currentText()), dataretrieve.getScreenID(screen_input.currentText())))
+        view_button.clicked.connect(lambda: GUI.check_parameters(view_schedule, main_window, branch_input.currentText(), screen_input.currentText()))
         buttons.addWidget(view_button)
         back_button = QPushButton("Back", main_window)
         back_button.setFixedSize(200, 50)
@@ -118,7 +139,7 @@ def customertickets(main_window):
         label.setFont(font)
         inputs_layout.addWidget(label)
 
-        customer_label = QLabel("Customer Phone", main_window)
+        customer_label = QLabel("Customer Phone, Email or ID", main_window)
         inputs_layout.addWidget(customer_label)
         customer_input = QLineEdit(main_window)
         inputs_layout.addWidget(customer_input)
@@ -126,7 +147,7 @@ def customertickets(main_window):
         buttons = QHBoxLayout()
         view_button = QPushButton("View", main_window)
         view_button.setFixedSize(200, 50)
-        view_button.clicked.connect(lambda: GUI.displaytable(main_window, ops.get_customer_tickets(conn, customer_input.text())))
+        view_button.clicked.connect(lambda: get_customer_tickets(main_window, customer_input.text()))
         buttons.addWidget(view_button)
         back_button = QPushButton("Back", main_window)
         back_button.setFixedSize(200, 50)
@@ -171,7 +192,7 @@ def sell_tickets(main_window):
         label.setFixedSize(485, 50)
         font = QFont("Helvetica", 20)
         label.setFont(font)
-        inputs_layout.addWidget(label)
+        layout.addWidget(label)
 
         customer_label = QLabel("Customer Phone", main_window)
         inputs_layout.addWidget(customer_label)
@@ -234,7 +255,7 @@ def sell_tickets(main_window):
         buttons = QHBoxLayout()
         sell_button = QPushButton("Sell", main_window)
         sell_button.setFixedSize(200, 50)
-        sell_button.clicked.connect(lambda: ops.sell_ticket(customer_input, branch_input, screening_input, seat_input, price_input))
+        sell_button.clicked.connect(lambda: GUI.check_parameters(ops.sell_ticket, customer_input, branch_input, screening_input, seat_input, price_input))
         buttons.addWidget(sell_button)
         back_button = QPushButton("Back", main_window)
         back_button.setFixedSize(200, 50)

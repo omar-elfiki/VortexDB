@@ -2,7 +2,7 @@ from PyQt5.QtWidgets import QPushButton, QGridLayout, QWidget, QTableView, QLabe
 from PyQt5.QtGui import QFont
 from PyQt5.QtCore import Qt
 from DBOps import dbconnect, dbadddata, dataretrieve, aggregate
-import mainGUI as GUI
+import GUI.mainGUI as GUI
 
 def total_tickets_sold(main_window):
     conn = dbconnect.db_connect()

@@ -21,7 +21,7 @@ def db_connect():
         return None
 
 def db_disconnect(main_window, db):
-    import mainGUI
+    import GUI.mainGUI as mainGUI
     mainGUI.clear(main_window)
     mainGUI.home(main_window)
     db.close()
