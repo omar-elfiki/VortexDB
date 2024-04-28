@@ -3,9 +3,20 @@ from PyQt5.QtGui import QFont, QPixmap
 from PyQt5.QtCore import Qt
 from PyQt5.QtSql import QSqlQueryModel
 from DBOps.dbconnect import db_connect, db_disconnect
-from guiadd import add_customer, add_employee, add_movie, add_screen, add_movie_showing, add_showing_management
-import guiops as ops
-import guireports as greports
+from GUI.guiadd import add_customer, add_employee, add_movie, add_screen, add_movie_showing, add_showing_management
+import GUI.guiops as ops
+import GUI.guireports as greports
+import GUI.guiview as gview
+
+def check_parameters(destination_function, *args):
+    for i, arg in enumerate(args, 1):
+        if not arg:
+            msg = QMessageBox()
+            msg.setWindowTitle("Error")
+            msg.setText(f"Error: Parameter {i} is empty.")
+            msg.exec_()
+            return
+    return destination_function(*args)
 
 def get_all(conn, table_name):
     model = QSqlQueryModel()
@@ -201,14 +212,10 @@ def view(main_window):
         Cmodel = get_all(conn, "Customer")
         Emodel = get_all(conn, "Employee")
         Mmodel = get_all(conn, "Movie")
-        Smodel = get_all(conn, "Screen")
-        MSmodel = get_all(conn, "Movie_Showing")
-        Tmodel = get_all(conn, "Ticket")
-        SMmodel = get_all(conn, "Showing_Management")
         name_list = ['Branches', 'Customers', 'Employees', 'Movies', 'Screens', 'Showings', 'Tickets', 'Management']
         functionlist = [lambda: displaytable(main_window, CBmodel), lambda: displaytable(main_window, Cmodel), lambda: displaytable(main_window, Emodel), 
-                        lambda: displaytable(main_window, Mmodel), lambda: displaytable(main_window, Smodel), lambda: displaytable(main_window, MSmodel), 
-                        lambda: displaytable(main_window, Tmodel), lambda: displaytable(main_window, SMmodel)]
+                        lambda: displaytable(main_window, Mmodel), lambda: gview.viewscreens(main_window), lambda: gview.viewshowings(main_window), 
+                        lambda: gview.viewtickets(main_window), lambda: gview.viewshifts(main_window)]
 
         grid_layout = QGridLayout()
         for i in range(4):
@@ -244,7 +251,6 @@ def view(main_window):
 
 
 def displaytable(main_window, model):
-    print(model)
     layout = QVBoxLayout()
 
     table_view = QTableView()

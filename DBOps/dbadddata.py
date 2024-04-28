@@ -1,6 +1,7 @@
 import DBOps.dbconnect as dbconnect
 import PyQt5.QtSql as QtSql
 from PyQt5.QtWidgets import QMessageBox
+import DBOps.dataretrieve as dataretrieve
 
 def add_new_customer(name, email, phone_number, birth_date):
     conn = dbconnect.db_connect()
@@ -29,12 +30,13 @@ def add_new_customer(name, email, phone_number, birth_date):
         msg.exec_()
 
 def add_new_screen(screen_id, branch_id, seat_type, numberofseats, dateofinspection):
+    screen  = int(screen_id)
     conn = dbconnect.db_connect()
     if conn is not None:
         query = QtSql.QSqlQuery(conn)
         insert_query = "INSERT INTO Screen (Screen_ID, Branch_ID, Seat_Type, Number_of_seats, Date_of_inspection) VALUES (?, ?, ?, ?, ?)"
         query.prepare(insert_query)
-        query.addBindValue(screen_id)
+        query.addBindValue(screen)
         query.addBindValue(branch_id)
         query.addBindValue(seat_type)
         query.addBindValue(numberofseats)
@@ -97,14 +99,17 @@ def add_new_ticket(customer_id, showing_id, screen_id, branch_id, seat_number, p
             msg.exec_()
 
 def add_new_showing(screen_id, branch_id, movie_id, date, time):
+    screenid = dataretrieve.getScreenID(screen_id)
+    branchid = dataretrieve.getbranchid(branch_id)
+    movieid = dataretrieve.getmovieid(movie_id)
     conn = dbconnect.db_connect()
     if conn is not None:
         query = QtSql.QSqlQuery(conn)
         insert_query = "INSERT INTO Movie_Showing (Screen_ID, Branch_ID, Movie_ID, Date, Time) VALUES (?, ?, ?, ?, ?)"
         query.prepare(insert_query)
-        query.addBindValue(screen_id)
-        query.addBindValue(branch_id)
-        query.addBindValue(movie_id)
+        query.addBindValue(screenid)
+        query.addBindValue(branchid)
+        query.addBindValue(movieid)
         query.addBindValue(date)
         query.addBindValue(time)
         if query.exec_():
@@ -153,6 +158,11 @@ def assign_management(Employee_ID, Showing_ID, Screen_ID, Branch_ID):
             msg = QMessageBox()
             msg.setWindowTitle("Success")
             msg.setText("New Showing Management added")
+            msg.exec_()
+        elif "Violation of PRIMARY KEY constraint" in query.lastError().text():
+            msg = QMessageBox()
+            msg.setWindowTitle("Error")
+            msg.setText("Employee is already assigned to this showing")
             msg.exec_()
         else:
             msg = QMessageBox()

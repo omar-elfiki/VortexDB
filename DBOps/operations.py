@@ -24,7 +24,7 @@ def get_screen_schedule(conn, screenID, branchID):
         WHERE 
             S.Screen_ID = :screenID AND S.Branch_ID = :branchID
         ORDER BY 
-            MS.Time
+            MS.Date
     """)
     query.bindValue(":screenID", screenID)
     query.bindValue(":branchID", branchID)
@@ -188,7 +188,6 @@ def sell_ticket(phone, branch_input, screening_input, seat_input, price_input):
         if query3.next():
             screenid = query3.value(0)
         query4.prepare(f"INSERT INTO Ticket (Customer_ID, Branch_ID, Showing_ID, Screen_ID, Seat_number, Price) VALUES ('{id}', '{branchid}', '{screening}', '{screenid}', '{seat}', '{price}')")
-        query4.exec_()
         if query4.exec_():
             msg = QMessageBox()
             msg.setWindowTitle("Success")

@@ -1,5 +1,5 @@
 from PyQt5.QtWidgets import QApplication, QMainWindow
-from mainGUI import home
+from GUI.mainGUI import home
 from PyQt5.QtGui import QIcon
 
 def main():
