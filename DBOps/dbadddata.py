@@ -53,6 +53,8 @@ def add_new_screen(screen_id, branch_id, seat_type, numberofseats, dateofinspect
             msg.exec_()
 
 def add_new_movie(title, language, subtitle, start_date, end_date, age_rating):
+    if subtitle == "Select Subtitles":
+        subtitle = None
     conn = dbconnect.db_connect()
     if conn is not None:
         query = QtSql.QSqlQuery(conn)
