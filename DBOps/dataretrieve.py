@@ -41,8 +41,8 @@ def getemployee(list, branch):
         if conn is not None:
             id = getbranchid(branch)
             query = QSqlQuery(conn)
-            select_query = (f"SELECT Name FROM Employee WHERE Branch_ID = '{id}'")
-            query.prepare(select_query)
+            query.prepare(f"SELECT Name FROM Employee WHERE Branch_ID = ?")
+            query.bindValue(0, id)
             if query.exec_():
                 while query.next():
                     list.append(query.value(0))
@@ -67,7 +67,7 @@ def getbranchid(selected_option):
             query = QSqlQuery(conn)
             select_query = "SELECT Branch_ID FROM Cinema_Branch WHERE Branch_name = ?"
             query.prepare(select_query)
-            query.addBindValue(selected_option)
+            query.bindValue(0, selected_option)
             if query.exec_():
                 query.next()
                 return query.value(0)
@@ -89,7 +89,7 @@ def getEmployeeid(selected_option):
             query = QSqlQuery(conn)
             select_query = "SELECT Employee_ID FROM Employee WHERE Name = ?"
             query.prepare(select_query)
-            query.addBindValue(selected_option)
+            query.bindValue(0, selected_option)
             if query.exec_():
                 query.next()
                 return query.value(0)
@@ -107,8 +107,8 @@ def getscreens(list,branch):
         if conn is not None:
             id = getbranchid(branch)
             query = QSqlQuery(conn)
-            select_query = (f"SELECT Screen_ID FROM Screen WHERE Branch_ID = '{id}'")
-            query.prepare(select_query)
+            query.prepare(f"SELECT Screen_ID FROM Screen WHERE Branch_ID = ?")
+            query.bindValue(0, id)
             if query.exec_():
                 while query.next():
                     list.append(f"Screen {str(query.value(0))}")
@@ -154,8 +154,8 @@ def getshowingIDs(list, branch):
         if conn is not None:
             id = getbranchid(branch)
             query = QSqlQuery(conn)
-            select_query = (f"SELECT Showing_ID FROM Movie_Showing WHERE Branch_ID = '{id}'")
-            query.prepare(select_query)
+            query.prepare(f"SELECT Showing_ID FROM Movie_Showing WHERE Branch_ID = ?")
+            query.bindValue(0, id)
             if query.exec_():
                 while query.next():
                     list.append(str(query.value(0)))
@@ -207,7 +207,7 @@ def getCustomerinfo(phone):
         query = QSqlQuery(conn)
         select_query = "SELECT Customer_ID, Name FROM Customer WHERE Phone_number = ?"
         query.prepare(select_query)
-        query.addBindValue(phone)
+        query.bindValue(0, phone)
         if query.exec_():
             query.next()
             return f"{query.value(0)} , {query.value(1)}"
@@ -223,7 +223,7 @@ def getcustID(phone):
         query = QSqlQuery(conn)
         select_query = "SELECT Customer_ID FROM Customer WHERE Phone_number = ?"
         query.prepare(select_query)
-        query.addBindValue(phone)
+        query.bindValue(0, phone)
         if query.exec_():
             query.next()
             return query.value(0)
@@ -241,8 +241,9 @@ def getshowingscreen(branch, screeningID):
         if conn is not None:
             id = getbranchid(branch)
             query = QSqlQuery(conn)
-            select_query = (f"SELECT Screen_ID FROM Movie_Showing WHERE Branch_ID = '{id}' AND Showing_ID = '{screeningID}'")
-            query.prepare(select_query)
+            query.prepare(f"SELECT Screen_ID FROM Movie_Showing WHERE Branch_ID = :id AND Showing_ID = :screeningID")
+            query.bindValue(":id", id)
+            query.bindValue(":screeningID", screeningID)
             if query.exec_():
                 query.next()
                 return str(query.value(0))
@@ -263,8 +264,8 @@ def getscreenvalidity(branch, screenID):
             id = getbranchid(branch)
             sid = int(screenID)
             query = QSqlQuery(conn)
-            select_query = (f"SELECT Screen_ID FROM Screen WHERE Branch_ID = '{id}'")
-            query.prepare(select_query)
+            query.prepare(f"SELECT Screen_ID FROM Screen WHERE Branch_ID = ?")
+            query.bindValue(0, id)
             if query.exec_():
                 while query.next():
                     if query.value(0) == sid:
@@ -288,7 +289,7 @@ def getmovieid(title):
             query = QSqlQuery(conn)
             select_query = "SELECT Movie_ID FROM Movie WHERE Title = ?"
             query.prepare(select_query)
-            query.addBindValue(title)
+            query.bindValue(0, title)
             if query.exec_():
                 query.next()
                 return query.value(0)
